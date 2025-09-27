@@ -1,0 +1,33 @@
+DROP TABLE IF EXISTS FeePayments;
+
+CREATE TABLE FeePayments(
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_name VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
+    payment_date DATE NOT NULL
+);
+
+-- Part A: Successful transaction
+START TRANSACTION;
+INSERT INTO FeePayments (student_name, amount, payment_date) VALUES
+('Ashish', 5000.00, '2024-06-01'),
+('Smaran', 4500.00, '2024-06-02'),
+('Vaibhav', 5500.00, '2024-06-03');
+COMMIT;
+
+-- Part B: Failed transaction triggers rollback
+START TRANSACTION;
+INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
+(1, 'Kiran', 4000.00, '2024-06-05'),
+(2, 'Ashish', 3000.00, '2024-06-01');
+ROLLBACK;
+
+-- Part C: Partial failure causes full rollback
+START TRANSACTION;
+INSERT INTO FeePayments (student_name, amount, payment_date) VALUES
+('Neha', 2500.00, '2024-06-06'),
+(NULL, 2000.00, '2024-06-07');
+ROLLBACK;
+
+-- Part D: ACID verification - final state of table
+SELECT * FROM FeePayments;
