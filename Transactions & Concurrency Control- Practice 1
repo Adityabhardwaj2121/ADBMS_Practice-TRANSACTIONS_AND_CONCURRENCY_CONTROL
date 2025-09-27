@@ -1,33 +1,39 @@
 DROP TABLE IF EXISTS FeePayments;
 
 CREATE TABLE FeePayments(
-    payment_id INT PRIMARY KEY AUTO_INCREMENT,
-    student_name VARCHAR(100) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
-    payment_date DATE NOT NULL
+    payment_id INT PRIMARY KEY,
+    student_name VARCHAR(50) NOT NULL,
+    amount DECIMAL(10,2) CHECK (amount > 0),
+    payment_date DATE
 );
 
 -- Part A: Successful transaction
 START TRANSACTION;
-INSERT INTO FeePayments (student_name, amount, payment_date) VALUES
-('Ashish', 5000.00, '2024-06-01'),
-('Smaran', 4500.00, '2024-06-02'),
-('Vaibhav', 5500.00, '2024-06-03');
+INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
+    (1, 'Ashish', 5000.00, '2024-06-01'),
+    (2, 'Smaran', 4500.00, '2024-06-02'),
+    (3, 'Vaibhav', 5500.00, '2024-06-03');
 COMMIT;
 
 -- Part B: Failed transaction triggers rollback
-START TRANSACTION;
-INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
-(1, 'Kiran', 4000.00, '2024-06-05'),
-(2, 'Ashish', 3000.00, '2024-06-01');
-ROLLBACK;
+-- START TRANSACTION;
+-- INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
+-- (4, 'Kiran', 3000.00, '2024-06-05'),
+-- (1, 'Ashish', -2000.00, '2024-06-05'); -- duplicate + invalid amount
+-- ROLLBACK;
 
 -- Part C: Partial failure causes full rollback
-START TRANSACTION;
-INSERT INTO FeePayments (student_name, amount, payment_date) VALUES
-('Neha', 2500.00, '2024-06-06'),
-(NULL, 2000.00, '2024-06-07');
-ROLLBACK;
+-- START TRANSACTION;
+-- INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
+-- (5, 'Rohit', 4000.00, '2024-06-06'),
+-- (6, NULL, 4200.00, '2024-06-06'); -- NULL student_name causes failure
+-- ROLLBACK;
 
 -- Part D: ACID verification - final state of table
+START TRANSACTION;
+INSERT INTO FeePayments (payment_id, student_name, amount, payment_date) VALUES
+    (7, 'Sneha', 4700.00, '2024-06-08'),
+    (8, 'Arjun', 4900.00, '2024-06-09');
+COMMIT;
+
 SELECT * FROM FeePayments;
